@@ -944,7 +944,7 @@ if ($selected_semester_id) {
 
         @media print {
             .report-filters, .export-buttons, .back-button,
-            .icon-back-wrapper, .no-print { display: none !important; }
+            .icon-back-wrapper, .no-print, #searchInput, #departmentFilter { display: none !important; }
             .report-container { box-shadow: none; margin: 0; }
             /* Force table text to print in black */
             .report-table th,
