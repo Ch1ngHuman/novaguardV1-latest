@@ -1,0 +1,16 @@
+<!-- use this page to connect to the cloud database infinityfree. Just copy the code and paste it in the connect.php file -->
+<?php
+
+$host="sql104.infinityfree.com";
+$user="if0_40042983";
+$password="butchinggwapo7";
+$database="if0_40042983_novaguard_db";
+$conn=new mysqli($host, $user, $password, $database);
+
+if($conn->connect_error){
+    die("Connection Failed: ".$conn->connect_error);
+}
+
+return $conn;
+
+?>

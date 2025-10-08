@@ -1,0 +1,944 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+:root {
+    --accent-color: skyblue;
+    --base-color: white;
+    --text-color: black;
+    --input-color: #F3F0FF;
+    --label-color: white;
+    --minorViolations-color: yellow;
+    --majorViolations-color: red;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-family: Poppins, Segoe UI, sans-serif;
+    font-size: 12pt;
+    color: var(--text-color);
+    height: 100%;
+    text-align: center;
+}
+
+body {
+    min-height: 100vh;
+    background-image: url("../assets/icons/images/nova schoola-Photoroom.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    position: relative;
+}
+
+/* Login page specific styles */
+body.login-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 500px;
+}
+
+.login-content {
+    border-radius: 15px;
+    padding: 40px;
+    width: 100%;
+    text-align: center;
+}
+
+.login-content h1 {
+    color: #231f1f;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.wrapper {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(50px);
+    border-radius: 10px;
+}
+
+.wrapper a {
+    color: darkblue;
+}
+
+.wrapper_cancel a {
+    display: inline-block;
+    padding: 0.5em 2em;
+    border-radius: 1000px;
+    background: white;
+    color: var(--accent-color);
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+}
+
+h1 {
+    font-size: 3rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #272729;
+}
+
+h2 {
+    font-size: 1rem;
+    font-weight: 900;
+    color: #F3F0FF;
+}
+
+h3 {
+    margin-top: 10px;
+    font-size: 2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #333;
+}
+
+/*SIGN IN / LOG IN / FORGOT PASSWORD / REGISTER STUDENT DESIGN AREA*/
+.globalForm > div{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.globalForm label {
+    flex-shrink: 0;
+    height: 50px;
+    width: 50px;
+    background-color: var(--accent-color);
+    color: var(--label-color);
+    border-radius: 10px 0 0 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.form-box {
+    width: min(400px, 100%);
+    margin: 20px auto 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Override form-box styles for login page */
+.login-content .form-box {
+    width: 100%;
+    margin-top: 0;
+    margin-bottom: 0;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+}
+
+.form-box form {
+    width: 100%;
+    max-width: 400px; /* or your preferred width */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* space between fields */
+}
+
+.form-box input[type="text"],
+.form-box input[type="email"],
+.form-box input[type="password"] {
+    box-sizing: border-box;
+    flex-grow: 1;
+    min-width: 0;
+    height: 50px;
+    padding: 1em;
+    font: inherit;
+    border-radius: 0 10px 10px 0;
+    border: 2px solid var(--input-color);
+    border-left: none;
+    background-color: var(--input-color);
+    transition: border 0.2s, background 0.2s;
+    outline: none;
+}
+
+/* Input wrapper for password fields with eye icon */
+.input-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+.input-wrapper input[type="password"] {
+    width: 100%;
+    padding-right: 40px; /* space for the eye icon */
+}
+.eye-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer !important;
+    display: flex;
+    align-items: center;
+    z-index: 2;
+    transition: color 0.2s, fill 0.2s;
+}
+.eye-toggle .eye-icon {
+    fill: black !important;
+    transition: fill 0.2s;
+}
+.eye-toggle:hover .eye-icon {
+    fill: var(--accent-color) !important;
+}
+
+.form-box input[type="text"]:hover,
+.form-box input[type="email"]:hover,
+.form-box input[type="password"]:hover {
+    border: 2px solid var(--accent-color);
+    background-color: #eaf6fb;
+}
+
+/*PARA MABAGO ANG KULAY NG SVG ICON*/
+form label svg {
+    fill: var(--label-color);
+}
+
+.globalForm input:hover {
+    border: 2px solid var(--accent-color);
+    background-color: #eaf6fb;
+}
+
+.globalForm input:focus {
+    border: 2px solid var(--text-color);
+    background-color: #fff;
+}
+
+/* Scope focus label background to .globalForm only to avoid affecting modal labels */
+.globalForm div:has(input:focus) > label{
+    background-color: var(--text-color);
+}
+
+/*KUNG GUSTO MO MAY COLOR ANG PLACEHOLDER
+form input::placeholder {
+    color: var(KUNG ANONG GUSTO MONG KULAY);
+}*/
+.globalForm button {
+    margin-top: 10px;
+    border: none;
+    border-radius: 1000px;
+    padding: 1em 3em;
+    background-color: var(--accent-color);
+    color: var(--base-color);
+    font: inherit;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 150ms ease;
+}
+
+.globalForm button:hover {
+    background-color: var(--text-color);
+}
+
+.globalForm button:focus {
+    outline: none;
+    background-color: var(--text-color);
+}
+
+a {
+    text-decoration: none;
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+form div.incorrect label {
+    background-color: red;
+}
+
+form div.incorrect input {
+    border-color: red;
+}
+
+#errorMessage {
+    color: red;
+}
+
+#login {
+    display: inline-block;
+
+    margin-top: 10px;
+    border: none;
+    border-radius: 50px;
+    padding: 1em 3em;
+    background-color: var(--accent-color);
+    color: var(--base-color);
+    font: inherit;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 150ms ease;
+    text-decoration: none;
+}
+
+#login:hover,
+#login:focus {
+    background-color: var(--text-color);
+    outline: none;
+}
+
+/*MAIN MENU BUTTON DESIGN AREA*/
+.mainMenuButton .button {
+    display: inline-block;
+    margin-top: 10px;
+    border: none;
+    border-radius: 0px 50px 0 50px;
+    padding: 1em 3em;
+    background-color: var(--accent-color);
+    color: var(--base-color);
+    font: inherit;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 150ms ease;
+    text-decoration: none;
+}
+
+.mainMenuButton .button:hover,
+.mainMenuButton .button:focus {
+    background-color: var(--text-color);
+    outline: none;
+}
+
+#logout {
+    display: inline-block;
+    margin-top: 10px;
+    border: none;
+    border-radius: 50px;
+    padding: 1em 3em;
+    background-color: skyblue;
+    color: var(--base-color);
+    font: inherit;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 150ms ease;
+    text-decoration: none;
+}
+
+#logout:hover,
+#logout:focus {
+    background-color: red;
+    outline: none;
+}
+
+/*Tinanggal ko na ang delete button pero what if ipabalik daw hoyy~
+#deleteInput:hover {
+    background-color: var(--majorViolations-color);
+}
+
+#deleteInput:focus {
+    background-color: var(--majorViolations-color);
+}*/
+
+/*VIOLATION LIST DESIGN AREA*/
+#typesOfViolations {
+    margin-top: 20px;
+    margin-bottom: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+#typesOfViolations > div{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#typesOfViolations label {
+    flex-shrink: 0;
+    height: 50px;
+    width: 50px;
+    background-color: var(--accent-color);
+    color: var(--label-color);
+    border-radius: 10px 0 0 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+#typesOfViolations select {
+    box-sizing: border-box;
+    min-width: 0;
+    height: 50px;
+    padding: 1em;
+    font: inherit;
+    border-radius: 0 10px 10px 0;
+    border: 2px solid var(--input-color);
+    border-left: none;
+    background-color: var(--input-color);
+    transition: 150ms ease;
+    font-size: small;
+    cursor: pointer;
+}
+
+#typesOfViolations select:hover {
+    border: 2px solid var(--accent-color);
+}
+
+#typesOfViolations select:focus {
+    outline: none;
+    border: 2px solid var(--text-color);
+}
+
+#addToStudent {
+    display: inline-block;
+    margin-top: 10px;
+    border: none;
+    border-radius: 50px;
+    padding: 1em 3em;
+    background-color: var(--accent-color);
+    color: var(--base-color);
+    font: inherit;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 150ms ease;
+    text-decoration: none;
+}
+
+#addToStudent:hover,
+#addToStudent:focus {
+    background-color: var(--text-color);
+    outline: none;
+}
+
+.error-message {
+    padding: 12px;
+    background: pink;
+    border-radius: 6px;
+    font-size: 16px;
+    color: red;
+    text-align: center;
+    margin-bottom: 20px;
+}
+/*gmail SMTP Configuration page design*/
+.setup-panel {
+    background: rgba(255,255,255,0.95);
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 32px 64px 32px 64px;
+}
+
+.setup-panel form,
+.setup-panel .setup-instructions {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.form-actions button {
+    display: inline-block;
+    margin-top: 10px;
+    border: none;
+    border-radius: 50px;
+    padding: 10px;
+    background-color: var(--accent-color);
+    color: var(--base-color);
+    font: inherit;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 150ms ease;
+    text-decoration: none;
+}
+.form-actions button:hover,
+.form-actions button:focus {
+    background-color: var(--text-color);
+    color: var(--base-color);
+    outline: none;
+}
+
+/* --- From index.php, now scoped to .index-page --- */
+.index-page{
+    margin-top: 50px;
+}
+.index-page .role-selection {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 30px 0;
+}
+
+.index-page .role-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    border: 2px solid #ddd;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+    width: 200px;
+    height: 200px;
+    justify-content: center;
+}
+
+.index-page .role-option:hover {
+    border-color: #667eea;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.index-page .role-option.selected {
+    border-color: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.index-page .role-option img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 15px;
+}
+
+.index-page .role-option h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.index-page .role-option p {
+    margin: 5px 0 0 0;
+    font-size: 14px;
+    text-align: center;
+}
+
+.index-page .login-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.index-page .form-box {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.index-page .header-section {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.index-page .header-section h1 {
+    color: #231f1f;
+    margin-bottom: 10px;
+}
+
+.index-page .header-section h3 {
+    color: #231f1f;
+    margin-bottom: 20px;
+}
+
+.index-page .error-message {
+    background: #ff4757;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.index-page .success-message {
+    background: #2ed573;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.index-page .input-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.index-page .input-wrapper input,
+.index-page .input-wrapper select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 25px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.index-page .input-wrapper input:focus,
+.index-page .input-wrapper select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.index-page .input-wrapper label {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+}
+
+.index-page .eye-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.index-page .login-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.index-page .login-btn:hover {
+    transform: scale(1.05);
+}
+
+.index-page .wrapper {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.index-page .wrapper a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.index-page .wrapper a:hover {
+    text-decoration: underline;
+}
+
+/* Add pointer cursor for select fields */
+.globalForm select,
+.form-box select {
+    cursor: pointer;
+}
+
+/*REGISTERED SUCCESSFUL MESSAGE TEXT COLOR*/
+.success-message {
+    color: lightgreen;
+    margin: 10px 0;
+}
+
+/* Notification styles */
+.notification {
+    width: 100vw;
+    padding: 18px 0;
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    border-radius: 0 0 10px 10px;
+    margin-bottom: 20px;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+}
+
+.notification.error {
+    background-color: #ffb3b3;
+    color: #b30000;
+}
+
+.notification.success {
+    background-color: #c6f7c3;
+    color: #1a7f1a;
+}
+
+/*ADMIN AND GUARD DASHBOARD DESIGN*/
+.circular-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: #f44336; /* red */
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.circular-icon:hover {
+    background-color: #d32f2f;
+    transform: scale(1.1);
+}
+
+.circular-icon svg {
+    stroke: #fff;
+    transition: stroke 0.3s ease;
+}
+
+.circular-icon:hover svg {
+    stroke: #fff;
+}
+
+
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.welcome-section {
+    background: linear-gradient(135deg, #667eea 0%, #282bf0 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.menu-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+}
+
+.menu-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.menu-card h3 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.menu-card p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.admin-button {
+    background: linear-gradient(135deg, #667eea 0%, #282bf0 100%);
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.admin-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.logout-section {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.logout-btn {
+    background: #ff4757;
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    background: #ff3742;
+    transform: scale(1.05);
+}
+
+.cancel-section {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.cancel-btn {
+    background: #ff4757;
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.cancel-btn:hover {
+    background: #ff3742;
+    transform: scale(1.05);
+}
+
+.stats-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.stat-number {
+    font-size: 2em;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.stat-label {
+    color: #666;
+    margin-top: 5px;
+}
+
+/* Minor Violations select: green */
+#minorViolations {
+    background-color: #e6f9ec;
+    border: 2px solid #2ecc40;
+    color: #218c3a;
+    font-weight: bold;
+    transition: border 0.2s, background 0.2s;
+}
+#minorViolations:hover, #minorViolations:focus {
+    background-color: #d0f5e2;
+    border: 2px solid #218c3a;
+}
+
+/* Major Violations select: red */
+#majorViolations {
+    background-color: #ffeaea;
+    border: 2px solid #ff4136;
+    color: #b30000;
+    font-weight: bold;
+    transition: border 0.2s, background 0.2s;
+}
+#majorViolations:hover, #majorViolations:focus {
+    background-color: #ffd6d6;
+    border: 2px solid #b30000;
+}
+
+/* Prevent scrolling on violation-list.php */
+body.violation-list-no-scroll {
+    overflow: hidden;
+}
+
+/* Add hover effect for clickable stat-card (total students) */
+.stats-section a .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+}
+
+/* Global icon-only back button */
+.icon-back-wrapper { position: fixed; top: 16px; left: 16px; z-index: 1000; }
+.icon-back-btn { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: #ffffff; color: #667eea; text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: transform .2s ease, box-shadow .2s ease, color .2s ease; }
+.icon-back-btn:hover { color: #5a6fd6; transform: translateX(-2px) scale(1.05); box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
+.icon-back-btn:active { transform: translateX(-1px) scale(0.98); }
+.icon-back-btn svg { width: 22px; height: 22px; transition: transform .2s ease; }
+.icon-back-btn:hover svg { transform: translateX(-2px); }
+
+.brand-logo-left,
+.brand-logo-right {
+    position: fixed;
+    top: 16px;
+    z-index: 1000;
+}
+.brand-logo-left { left: 16px; }
+.brand-logo-right { right: 16px; }
+.brand-logo-left img,
+.brand-logo-right img {
+    height: 100px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.brand-logo-left:hover img,
+.brand-logo-right:hover img {
+    transform: scale(1.05);
+    border-radius: 10px;
+}
+
+/*modal button styles*/
+.confirmCancelBtn {
+    background: #757575;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+}
+.confirmCancelBtn:hover {
+    background: #5e5d5d;
+}
+.confirmSubmitBtn {
+    background: #667eea;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+}
+.confirmSubmitBtn:hover {
+    background: #5b70cf;
+}
