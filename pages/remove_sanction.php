@@ -66,6 +66,7 @@ try {
     
     if ($update_stmt->execute()) {
         if ($update_stmt->affected_rows > 0) {
+            // Do not modify student_summary_archive here: archive should only be incremented when hours are added
             echo json_encode(['success' => true, 'message' => 'Sanction removed successfully']);
         } else {
             echo json_encode(['success' => false, 'message' => 'No active sanction found to remove']);

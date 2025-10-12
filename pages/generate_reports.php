@@ -14,58 +14,48 @@ function safe_htmlspecialchars($value) {
 }
 
 // Handle CSV export
-if (isset($_GET['export']) && $_GET['export'] === 'csv') {
+// Handle XLSX (Excel) export with bold headers
+if (isset($_GET['export']) && $_GET['export'] === 'xlsx') {
     $selected_year_id = $_GET['school_year_id'] ?? null;
     $selected_semester_id = !empty($_GET['semester_id']) ? $_GET['semester_id'] : null;
     $report_type = $_GET['report_type'] ?? 'summary';
 
     if ($selected_year_id) {
-        // Get school year info
-        $year_query = "SELECT school_year FROM school_year WHERE id = ?";
-        $year_stmt = $conn->prepare($year_query);
-        $year_stmt->bind_param('i', $selected_year_id);
-        $year_stmt->execute();
-        $year_info = $year_stmt->get_result()->fetch_assoc();
-
-        // Get semester info if provided
-        $semester_info = null;
-        if ($selected_semester_id) {
-            $semester_query = "SELECT semester_name FROM semesters WHERE id = ?";
-            $semester_stmt = $conn->prepare($semester_query);
-            $semester_stmt->bind_param('i', $selected_semester_id);
-            $semester_stmt->execute();
-            $semester_info = $semester_stmt->get_result()->fetch_assoc();
-        }
-
         // Generate report data
         $report_data = generateViolationSummaryReport($conn, $selected_year_id, $selected_semester_id);
 
-        // Set headers for CSV download
-        header('Content-Type: text/csv');
-        $filename = 'violation_report_' . ($year_info['school_year'] ?? 'report');
-        if ($semester_info) {
-            $filename .= '_' . preg_replace('/[^A-Za-z0-9_\-]/', '_', $semester_info['semester_name']);
+        // Require phpspreadsheet autoloader
+        $autoloadPath = realpath(__DIR__ . '/../vendor/autoload.php');
+        if (!$autoloadPath || !file_exists($autoloadPath)) {
+            header('Content-Type: text/html; charset=UTF-8');
+            echo '<p>PhpSpreadsheet not found. Please install with: composer require phpoffice/phpspreadsheet</p>';
+            exit();
         }
-        header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
+        require_once $autoloadPath;
 
-        // Create CSV output
-        $output = fopen('php://output', 'w');
+        // Create spreadsheet and populate
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
 
-        // CSV headers matching Google Sheets format with first violation date
-        fputcsv($output, [
-            'Name', 'Year&Course', 'First Violation Date', 'Violation 1', 'Violation 2', 'Violation 3', 'Violation 4', 'Sanction', 'Remarks'
-        ]);
+        // Header row (add Violation 5)
+        $headers = ['Name', 'Year&Course', 'First Violation Date', 'Last Violation Date', 'Violation 1', 'Violation 2', 'Violation 3', 'Violation 4', 'Violation 5', 'Sanction', 'Comment/s'];
+        $col = 'A';
+        foreach ($headers as $h) {
+            $sheet->setCellValue($col . '1', $h);
+            $col++;
+        }
 
-        // CSV data - restructure to show individual violations
+        // Make header bold
+        $sheet->getStyle('A1:K1')->getFont()->setBold(true);
+
+        // Fill data rows
+        $rowNum = 2;
         foreach ($report_data as $row) {
-            // Parse violations into individual columns (without dates)
-            $violations = explode(', ', $row['violations'] ?? '');
-            $violations = array_map('trim', $violations);
-            
-            // Format student info
+            $violations = array_map('trim', explode(', ', $row['violations'] ?? ''));
+
+            // student, year_course
             $student_name = $row['student_name'] ?? '';
             $year_course = '';
-            
             if ($row['student_type'] === 'jhs') {
                 $year_course = 'JHS ' . ($row['student_level'] ?? '');
             } elseif ($row['student_type'] === 'shs') {
@@ -73,53 +63,90 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
             } elseif ($row['student_type'] === 'college') {
                 $year_course = 'COLLEGE ' . ($row['student_level'] ?? '') . ' ' . ($row['student_course_strand'] ?? '');
             }
-            
-            // Format first violation date
-            $first_violation_date = '';
-            if (!empty($row['first_violation'])) {
-                $first_violation_date = date('M d, Y', strtotime($row['first_violation']));
-            }
-            
-            // Format sanction
+
+            $first_violation_date = !empty($row['first_violation']) ? date('M d, Y', strtotime($row['first_violation'])) : '';
+            $last_violation_date = !empty($row['last_violation']) ? date('M d, Y', strtotime($row['last_violation'])) : '';
+
+            // sanction
             $sanction = '';
-            $remarks = '';
-            
             if (isset($row['sanction_status']) && $row['sanction_status'] !== 'Completed') {
                 $sanction_text = $row['sanction_status'] ?? '';
                 if (strpos($sanction_text, 'Incomplete') !== false) {
-                    // Extract hours from "Incomplete (X hours)"
                     preg_match('/(\d+)\s*hours?/', $sanction_text, $matches);
                     $hours = $matches[1] ?? '0';
                     $sanction = $hours . ' hours community service';
-                    $remarks = 'INCOMPLETE';
                 } else {
                     $sanction = $sanction_text;
-                    $remarks = 'INCOMPLETE';
                 }
             } else {
-                $remarks = 'DONE';
+                $total_hours = 0;
+                if (!empty($row['student_id'])) {
+                    $ssa_stmt = $conn->prepare("SELECT total_sanction_hours FROM student_summary_archive WHERE student_id = ? AND student_type = ? AND school_year_id = ? LIMIT 1");
+                    if ($ssa_stmt) {
+                        $ssa_stmt->bind_param('isi', $row['student_id'], $row['student_type'], $selected_year_id);
+                        $ssa_stmt->execute();
+                        $ssa_res = $ssa_stmt->get_result();
+                        if ($ssa_row = $ssa_res->fetch_assoc()) {
+                            $total_hours = (int)$ssa_row['total_sanction_hours'];
+                        }
+                        $ssa_stmt->close();
+                    }
+                }
+                $sanction = 'Completed (' . $total_hours . ' hours)';
             }
-            
-            // Create row with up to 4 violation columns
-            $csv_row = [
-                $student_name,
-                $year_course,
-                $first_violation_date,
-                $violations[0] ?? '',
-                $violations[1] ?? '',
-                $violations[2] ?? '',
-                $violations[3] ?? '',
-                $sanction,
-                $remarks
-            ];
-            
-            fputcsv($output, $csv_row);
+
+            // Write cells
+            $sheet->setCellValue('A' . $rowNum, $student_name);
+            $sheet->setCellValue('B' . $rowNum, $year_course);
+            $sheet->setCellValue('C' . $rowNum, $first_violation_date);
+            $sheet->setCellValue('D' . $rowNum, $last_violation_date);
+            $sheet->setCellValue('E' . $rowNum, $violations[0] ?? '');
+            $sheet->setCellValue('F' . $rowNum, $violations[1] ?? '');
+            $sheet->setCellValue('G' . $rowNum, $violations[2] ?? '');
+            $sheet->setCellValue('H' . $rowNum, $violations[3] ?? '');
+            $sheet->setCellValue('I' . $rowNum, $violations[4] ?? '');
+            $sheet->setCellValue('J' . $rowNum, $sanction);
+            // Comment/s left blank intentionally
+            $sheet->setCellValue('K' . $rowNum, '');
+
+            $rowNum++;
         }
 
-        fclose($output);
+        // Auto-size columns (optional)
+        foreach (range('A', 'K') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        // Stream to browser — build filename using selected school year label if available
+        $xlsxYearLabel = 'report';
+        if (!empty($selected_year_id)) {
+            // Fetch the school_year label directly from the database to avoid relying on
+            // $school_years (which is defined later in the file) and prevent undefined
+            // variable / foreach warnings when this export runs early.
+            $sy_stmt = $conn->prepare("SELECT school_year FROM school_year WHERE id = ? LIMIT 1");
+            if ($sy_stmt) {
+                $sy_stmt->bind_param('i', $selected_year_id);
+                $sy_stmt->execute();
+                $sy_res = $sy_stmt->get_result();
+                if ($sy_row = $sy_res->fetch_assoc()) {
+                    $xlsxYearLabel = $sy_row['school_year'];
+                }
+                $sy_stmt->close();
+            }
+        }
+        // Sanitize filename portion
+        $xlsxYearLabel = preg_replace('/[^A-Za-z0-9_\-]/', '_', $xlsxYearLabel);
+
+        $filename = 'violation_report_' . $xlsxYearLabel . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
         exit();
     }
 }
+
+// CSV export removed — XLSX export is the preferred method now
 
 // Handle PDF export with improved error handling
 if (isset($_GET['export']) && $_GET['export'] === 'pdf') {
@@ -276,6 +303,22 @@ if (isset($_GET['export']) && $_GET['export'] === 'pdf') {
                         $sanction = $sanction_text;
                         $remarks = 'INCOMPLETE';
                     }
+                } else {
+                    // Completed - show total hours from student_summary_archive if available
+                    $total_hours = 0;
+                    if (!empty($row['student_id'])) {
+                        $ssa_stmt = $conn->prepare("SELECT total_sanction_hours FROM student_summary_archive WHERE student_id = ? AND student_type = ? AND school_year_id = ? LIMIT 1");
+                        if ($ssa_stmt) {
+                            $ssa_stmt->bind_param('isi', $row['student_id'], $row['student_type'], $selected_year_id);
+                            $ssa_stmt->execute();
+                            $ssa_res = $ssa_stmt->get_result();
+                            if ($ssa_row = $ssa_res->fetch_assoc()) {
+                                $total_hours = (int)$ssa_row['total_sanction_hours'];
+                            }
+                            $ssa_stmt->close();
+                        }
+                    }
+                    $sanction = 'Completed (' . $total_hours . ' hours)';
                 }
                 
                 // Use htmlspecialchars with explicit encoding
@@ -293,6 +336,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'pdf') {
                     . '<td>' . htmlspecialchars($violations[1] ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</td>'
                     . '<td>' . htmlspecialchars($violations[2] ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</td>'
                     . '<td>' . htmlspecialchars($violations[3] ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</td>'
+                    . '<td>' . htmlspecialchars($violations[4] ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</td>'
                     . '<td>' . $sanction . '</td>'
                     . '<td>' . $remarks . '</td>'
                     . '</tr>';
@@ -359,6 +403,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'pdf') {
                 <th>Violation 2</th>
                 <th>Violation 3</th>
                 <th>Violation 4</th>
+                <th>Violation 5</th>
                 <th>Sanction</th>
                 <th>Remarks</th>
             </tr>
@@ -1069,7 +1114,7 @@ if ($selected_semester_id) {
             <!-- Export Buttons -->
             <div class="export-buttons">
                 <button onclick="window.print()" class="export-btn">Print Report</button>
-                <a href="?school_year_id=<?= urlencode($selected_year_id ?? '') ?>&semester_id=<?= urlencode($selected_semester_id ?? '') ?>&report_type=summary&export=csv" class="export-btn">Export into EXCEL file</a>
+                <a href="?school_year_id=<?= urlencode($selected_year_id ?? '') ?>&semester_id=<?= urlencode($selected_semester_id ?? '') ?>&report_type=summary&export=xlsx" class="export-btn">Export as Excel (.xlsx)</a>
                 <!-- <a href="?school_year_id=<?= urlencode($selected_year_id ?? '') ?>&semester_id=<?= urlencode($selected_semester_id ?? '') ?>&report_type=summary&export=pdf" class="export-btn">Export as PDF</a> -->
                 <?php
                 // Only show delete button if there's archived data for this year
@@ -1120,7 +1165,32 @@ if ($selected_semester_id) {
                             <td><?= safe_htmlspecialchars($row['violations']) ?></td>
                             <td><?= $row['first_violation'] ? date('M d, Y', strtotime($row['first_violation'])) : '-' ?></td>
                             <td><?= $row['last_violation'] ? date('M d, Y', strtotime($row['last_violation'])) : '-' ?></td>
-                            <td><?= isset($row['sanction_status']) ? safe_htmlspecialchars($row['sanction_status']) : '-' ?></td>
+                            <td>
+                                <?php
+                                    // Display 'Completed (N hours)' when sanction is Completed, otherwise show status
+                                    $sanction_display = '-';
+                                    if (isset($row['sanction_status']) && $row['sanction_status'] !== 'Completed') {
+                                        $sanction_display = $row['sanction_status'];
+                                    } else {
+                                        $total_hours = 0;
+                                        if (!empty($row['student_id'])) {
+                                            $ssa_stmt = $conn->prepare("SELECT total_sanction_hours FROM student_summary_archive WHERE student_id = ? AND student_type = ? AND school_year_id = ? LIMIT 1");
+                                            if ($ssa_stmt) {
+                                                $ssa_stmt->bind_param('isi', $row['student_id'], $row['student_type'], $selected_year_id);
+                                                $ssa_stmt->execute();
+                                                $ssa_res = $ssa_stmt->get_result();
+                                                if ($ssa_row = $ssa_res->fetch_assoc()) {
+                                                    $total_hours = (int)$ssa_row['total_sanction_hours'];
+                                                }
+                                                $ssa_stmt->close();
+                                            }
+                                        }
+                                        $sanction_display = 'Completed (' . $total_hours . ' hours)';
+                                    }
+
+                                    echo safe_htmlspecialchars($sanction_display);
+                                ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -1230,9 +1300,12 @@ if ($selected_semester_id) {
                     // Check sanction status filter
                     let matchesFilter = true;
                     if (filterValue === 'completed') {
-                        matchesFilter = sanctionStatus.includes('completed') || sanctionStatus === 'completed';
+                        // Match only statuses that explicitly contain 'completed'
+                        matchesFilter = sanctionStatus.indexOf('completed') !== -1;
                     } else if (filterValue === 'incomplete') {
-                        matchesFilter = sanctionStatus.includes('incomplete') || sanctionStatus.includes('hours');
+                        // Match only statuses that explicitly contain 'incomplete'
+                        // Some statuses contain 'Incomplete (X hours)' — normalize and check for 'incomplete'
+                        matchesFilter = sanctionStatus.indexOf('incomplete') !== -1;
                     }
                     // If filterValue is 'all', matchesFilter remains true
 

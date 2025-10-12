@@ -252,6 +252,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $insert_sanction_stmt->close();
             }
+
+                // Only increment archive when sanction hours were added (do not decrease on reductions)
+                if (!empty($total_sanction_hours) && (int)$total_sanction_hours > 0) {
+                    try {
+                        $inc = $conn->prepare("UPDATE student_summary_archive SET total_sanction_hours = total_sanction_hours + ? WHERE student_id = ? AND student_type = ? AND school_year_id = ?");
+                        if ($inc) {
+                            $inc->bind_param('iisi', $total_sanction_hours, $student_id, $student_type, $school_year_id);
+                            $inc->execute();
+                            $inc->close();
+                        }
+                    } catch (Exception $e) {
+                        error_log('Failed to increment student_summary_archive: ' . $e->getMessage());
+                    }
+                }
         } else {
             error_log("Failed to prepare statement: " . $conn->error);
         }

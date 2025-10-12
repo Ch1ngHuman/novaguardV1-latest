@@ -117,6 +117,19 @@ try {
             throw new Exception('Failed to update sanction');
         }
         $update_stmt->close();
+        // Only increment archive by the newly added hours
+        try {
+            if ($new_hours_numeric > 0) {
+                $inc = $conn->prepare("UPDATE student_summary_archive SET total_sanction_hours = total_sanction_hours + ? WHERE student_id = ? AND student_type = ? AND school_year_id = ?");
+                if ($inc) {
+                    $inc->bind_param('iisi', $new_hours_numeric, $student_id, $student_type, $current_school_year_id);
+                    $inc->execute();
+                    $inc->close();
+                }
+            }
+        } catch (Exception $e) {
+            error_log('Failed to increment archive in save_sanction: ' . $e->getMessage());
+        }
     } else {
         // Insert new sanction (numeric storage)
         // JHS doesn't use semester_id
@@ -144,6 +157,19 @@ try {
             throw new Exception('Failed to assign sanction');
         }
         $insert_stmt->close();
+        // Increment archive by the newly inserted hours
+        try {
+            if ($new_hours_numeric > 0) {
+                $inc = $conn->prepare("UPDATE student_summary_archive SET total_sanction_hours = total_sanction_hours + ? WHERE student_id = ? AND student_type = ? AND school_year_id = ?");
+                if ($inc) {
+                    $inc->bind_param('iisi', $new_hours_numeric, $student_id, $student_type, $current_school_year_id);
+                    $inc->execute();
+                    $inc->close();
+                }
+            }
+        } catch (Exception $e) {
+            error_log('Failed to increment archive after insert in save_sanction: ' . $e->getMessage());
+        }
     }
 
     $check_stmt->close();

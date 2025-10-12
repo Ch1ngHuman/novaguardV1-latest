@@ -299,7 +299,8 @@ if (isset($_SESSION['success_message'])) {
                 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;By replacing outdated manual logbooks with a digital platform, we help staff and guards quickly record, manage, and review violations and ensure that data is always reliable and secure.</p>
                 
                 <div class="version-info">
-                    App Version: 1.0.0
+                    App Version: 1.0.0 <br>
+                    Having trouble? email us at <a href="mailto:novaguard3@gmail.com">novaguard3@gmail.com</a>
                 </div>
             </div>
 
@@ -307,15 +308,15 @@ if (isset($_SESSION['success_message'])) {
                 <h3>Our Team</h3>
                 <div class="team-members">
                     <div class="team-member">
-                        <img src="./assets/icons/images/𝐼𝑡𝑎𝑐ℎ𝑖.png" alt="Diether Flores" onerror="this.src='https://via.placeholder.com/60x60/007bff/white?text=CJ'">
+                        <img src="./assets/icons/images/diether.jpg" alt="Diether Flores" onerror="this.src='https://via.placeholder.com/60x60/007bff/white?text=CJ'">
                         <span>Diether Flores</span>
                     </div>
                     <div class="team-member">
-                        <img src="./assets/icons/images/Obito😮_💨.png" alt="Eunecis Raymundo" onerror="this.src='https://via.placeholder.com/60x60/007bff/white?text=J'">
+                        <img src="./assets/icons/images/eunices.jpg" alt="Eunecis Raymundo" onerror="this.src='https://via.placeholder.com/60x60/007bff/white?text=J'">
                         <span>Eunecis Raymundo</span>
                     </div>
                     <div class="team-member">
-                        <img src="./assets/icons/images/Uchiha Sasuke Icon.png" alt="Butch Salar" onerror="this.src='https://via.placeholder.com/60x60/007bff/white?text=AJ'">
+                        <img src="./assets/icons/images/IMG_20210410_215217.png" alt="Butch Salar" onerror="this.src='https://via.placeholder.com/60x60/007bff/white?text=AJ'">
                         <span>Butch Salar</span>
                     </div>
                 </div>

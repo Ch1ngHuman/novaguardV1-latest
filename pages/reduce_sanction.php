@@ -152,6 +152,8 @@ try {
                 // Commit transaction
                 $conn->commit();
 
+                    // Do not modify student_summary_archive on sanction deletion here (archive should reflect only added hours)
+
                 echo json_encode([
                     'success' => true,
                     'message' => "Sanction completed! All violations and sanctions have been cleared for this student.",
@@ -193,6 +195,7 @@ try {
                 throw new Exception('Failed to reduce sanction');
             }
             $update_stmt->close();
+            // Do not modify student_summary_archive on sanction reduction (only increment on additions)
         }
     } else {
         // No active sanction found
