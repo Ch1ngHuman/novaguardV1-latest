@@ -141,10 +141,10 @@ function archiveSchoolYearData($conn, $school_year_id) {
         $college_crim_archived = $stmt->affected_rows;
         $success_messages[] = "Archived $college_crim_archived College CRIM violations";
         
-        // Archive student summaries for JHS
+        // Archive student summaries for JHS (omit last_violation_date column — removed from schema)
         $jhs_summary = "INSERT INTO student_summary_archive 
                        (student_id, student_name, student_type, student_level, school_year_id, 
-                        school_year, total_violations, total_sanction_hours, first_violation_date, last_violation_date)
+                        school_year, total_violations, total_sanction_hours, first_violation_date)
                        SELECT 
                            s.id,
                            CONCAT(s.firstName, ' ', COALESCE(s.middleName, ''), ' ', s.lastName),
@@ -154,8 +154,7 @@ function archiveSchoolYearData($conn, $school_year_id) {
                            ?,
                            COUNT(v.id),
                            COALESCE(san.sanction_hours, '0'),
-                           MIN(v.date_recorded),
-                           MAX(v.date_recorded)
+                           MIN(v.date_recorded)
                        FROM jhs_students s
                        LEFT JOIN hs_violations v ON s.id = v.student_id AND v.school_year_id = ?
                        LEFT JOIN student_sanctions san ON s.id = san.student_id AND san.student_type = 'jhs' AND san.school_year_id = ?
@@ -164,8 +163,7 @@ function archiveSchoolYearData($conn, $school_year_id) {
                        ON DUPLICATE KEY UPDATE
                            total_violations = VALUES(total_violations),
                            total_sanction_hours = VALUES(total_sanction_hours),
-                           first_violation_date = VALUES(first_violation_date),
-                           last_violation_date = VALUES(last_violation_date)";
+                           first_violation_date = VALUES(first_violation_date)";
         
         $stmt = $conn->prepare($jhs_summary);
         $stmt->bind_param('isii', $school_year_id, $school_year_text, $school_year_id, $school_year_id);

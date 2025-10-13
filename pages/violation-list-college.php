@@ -132,20 +132,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $arc->close();
                     }
 
-                    $sumSql = "INSERT INTO student_summary_archive
-                        (student_id, student_name, student_type, student_level, student_course_strand, school_year_id, semester_id, school_year,
-                         total_violations, total_sanction_hours, first_violation_date, last_violation_date)
-                        SELECT s.id, CONCAT(s.firstName,' ',COALESCE(s.middleName,''),' ',s.LastName),
-                               'college', s.year_lvl, s.course, ?, ?, ?, 1,
-                               COALESCE(san.sanction_hours,0), NOW(), NOW()
-                        FROM college_students s
-                        LEFT JOIN student_sanctions san ON san.student_id=s.id AND san.student_type='college' AND san.school_year_id=?
-                        WHERE s.id=?
-                        ON DUPLICATE KEY UPDATE
-                          total_violations = total_violations + 1,
-                          total_sanction_hours = VALUES(total_sanction_hours),
-                          first_violation_date = LEAST(first_violation_date, VALUES(first_violation_date)),
-                          last_violation_date = GREATEST(last_violation_date, VALUES(last_violation_date))";
+              $sumSql = "INSERT INTO student_summary_archive
+               (student_id, student_name, student_type, student_level, student_course_strand, school_year_id, semester_id, school_year,
+                total_violations, total_sanction_hours, first_violation_date)
+               SELECT s.id, CONCAT(s.firstName,' ',COALESCE(s.middleName,''),' ',s.LastName),
+                   'college', s.year_lvl, s.course, ?, ?, ?, 1,
+                   COALESCE(san.sanction_hours,0), NOW()
+               FROM college_students s
+               LEFT JOIN student_sanctions san ON san.student_id=s.id AND san.student_type='college' AND san.school_year_id=?
+               WHERE s.id=?
+               ON DUPLICATE KEY UPDATE
+                 total_violations = total_violations + 1,
+                 total_sanction_hours = VALUES(total_sanction_hours),
+                 first_violation_date = LEAST(first_violation_date, VALUES(first_violation_date))";
                     if ($sum = $conn->prepare($sumSql)) {
                         $sum->bind_param('iisii', $school_year_id, $current_semester, $school_year_text, $school_year_id, $student_id);
                         $sum->execute();

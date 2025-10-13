@@ -37,16 +37,17 @@ if (isset($_GET['export']) && $_GET['export'] === 'xlsx') {
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Header row (add Violation 5)
-        $headers = ['Name', 'Year&Course', 'First Violation Date', 'Last Violation Date', 'Violation 1', 'Violation 2', 'Violation 3', 'Violation 4', 'Violation 5', 'Sanction', 'Comment/s'];
+    // Header row (remove Last Violation Date column — column removed from DB)
+    // Added 'Date Completed' column between Date Reported and Sanctions
+    $headers = ['Name', 'Year&Course', 'First Violation Date', 'Violation 1', 'Violation 2', 'Violation 3', 'Violation 4', 'Violation 5', 'Date Reported', 'Date Completed', 'Sanction', 'Comment/s'];
         $col = 'A';
         foreach ($headers as $h) {
             $sheet->setCellValue($col . '1', $h);
             $col++;
         }
 
-        // Make header bold
-        $sheet->getStyle('A1:K1')->getFont()->setBold(true);
+    // Make header bold (A1:L1)
+    $sheet->getStyle('A1:L1')->getFont()->setBold(true);
 
         // Fill data rows
         $rowNum = 2;
@@ -65,7 +66,25 @@ if (isset($_GET['export']) && $_GET['export'] === 'xlsx') {
             }
 
             $first_violation_date = !empty($row['first_violation']) ? date('M d, Y', strtotime($row['first_violation'])) : '';
-            $last_violation_date = !empty($row['last_violation']) ? date('M d, Y', strtotime($row['last_violation'])) : '';
+            $date_reported = !empty($row['first_violation']) ? date('M d, Y', strtotime($row['first_violation'])) : '';
+            $date_completed = '';
+            if (!empty($row['date_completed'])) {
+                $date_completed = date('M d, Y', strtotime($row['date_completed']));
+            } elseif (!empty($row['student_id'])) {
+                // Fallback: fetch date_completed from student_summary_archive if not present in report row
+                $ssa_stmt = $conn->prepare("SELECT date_completed FROM student_summary_archive WHERE student_id = ? AND student_type = ? AND school_year_id = ? LIMIT 1");
+                if ($ssa_stmt) {
+                    $ssa_stmt->bind_param('isi', $row['student_id'], $row['student_type'], $selected_year_id);
+                    $ssa_stmt->execute();
+                    $ssa_res = $ssa_stmt->get_result();
+                    if ($ssa_row = $ssa_res->fetch_assoc()) {
+                        if (!empty($ssa_row['date_completed'])) {
+                            $date_completed = date('M d, Y', strtotime($ssa_row['date_completed']));
+                        }
+                    }
+                    $ssa_stmt->close();
+                }
+            }
 
             // sanction
             $sanction = '';
@@ -99,21 +118,22 @@ if (isset($_GET['export']) && $_GET['export'] === 'xlsx') {
             $sheet->setCellValue('A' . $rowNum, $student_name);
             $sheet->setCellValue('B' . $rowNum, $year_course);
             $sheet->setCellValue('C' . $rowNum, $first_violation_date);
-            $sheet->setCellValue('D' . $rowNum, $last_violation_date);
-            $sheet->setCellValue('E' . $rowNum, $violations[0] ?? '');
-            $sheet->setCellValue('F' . $rowNum, $violations[1] ?? '');
-            $sheet->setCellValue('G' . $rowNum, $violations[2] ?? '');
-            $sheet->setCellValue('H' . $rowNum, $violations[3] ?? '');
-            $sheet->setCellValue('I' . $rowNum, $violations[4] ?? '');
-            $sheet->setCellValue('J' . $rowNum, $sanction);
+            $sheet->setCellValue('D' . $rowNum, $violations[0] ?? '');
+            $sheet->setCellValue('E' . $rowNum, $violations[1] ?? '');
+            $sheet->setCellValue('F' . $rowNum, $violations[2] ?? '');
+            $sheet->setCellValue('G' . $rowNum, $violations[3] ?? '');
+            $sheet->setCellValue('H' . $rowNum, $violations[4] ?? '');
+            $sheet->setCellValue('I' . $rowNum, $date_reported);
+            $sheet->setCellValue('J' . $rowNum, $date_completed);
+            $sheet->setCellValue('K' . $rowNum, $sanction);
             // Comment/s left blank intentionally
-            $sheet->setCellValue('K' . $rowNum, '');
+            $sheet->setCellValue('L' . $rowNum, '');
 
             $rowNum++;
         }
 
         // Auto-size columns (optional)
-        foreach (range('A', 'K') as $columnID) {
+        foreach (range('A', 'L') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
 
@@ -328,6 +348,29 @@ if (isset($_GET['export']) && $_GET['export'] === 'pdf') {
                 $sanction = htmlspecialchars($sanction, ENT_QUOTES | ENT_HTML5, 'UTF-8');
                 $remarks = htmlspecialchars($remarks, ENT_QUOTES | ENT_HTML5, 'UTF-8');
                 
+                // Determine date reported and date completed
+                $dateReportedHtml = htmlspecialchars($firstViolationDate, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                $dateCompletedHtml = '';
+                if (!empty($row['date_completed'])) {
+                    $dateCompletedHtml = htmlspecialchars(date('M d, Y', strtotime($row['date_completed'])), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                } else {
+                    // try to fetch from archive if available
+                    if (!empty($row['student_id'])) {
+                        $ssa_stmt = $conn->prepare("SELECT date_completed FROM student_summary_archive WHERE student_id = ? AND student_type = ? AND school_year_id = ? LIMIT 1");
+                        if ($ssa_stmt) {
+                            $ssa_stmt->bind_param('isi', $row['student_id'], $row['student_type'], $selected_year_id);
+                            $ssa_stmt->execute();
+                            $ssa_res = $ssa_stmt->get_result();
+                            if ($ssa_row = $ssa_res->fetch_assoc()) {
+                                if (!empty($ssa_row['date_completed'])) {
+                                    $dateCompletedHtml = htmlspecialchars(date('M d, Y', strtotime($ssa_row['date_completed'])), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                                }
+                            }
+                            $ssa_stmt->close();
+                        }
+                    }
+                }
+
                 $rowsHtml .= '<tr>'
                     . '<td>' . $studentName . '</td>'
                     . '<td>' . $yearCourse . '</td>'
@@ -337,6 +380,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'pdf') {
                     . '<td>' . htmlspecialchars($violations[2] ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</td>'
                     . '<td>' . htmlspecialchars($violations[3] ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</td>'
                     . '<td>' . htmlspecialchars($violations[4] ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</td>'
+                    . '<td>' . $dateReportedHtml . '</td>'
+                    . '<td>' . $dateCompletedHtml . '</td>'
                     . '<td>' . $sanction . '</td>'
                     . '<td>' . $remarks . '</td>'
                     . '</tr>';
@@ -404,6 +449,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'pdf') {
                 <th>Violation 3</th>
                 <th>Violation 4</th>
                 <th>Violation 5</th>
+                <th>Date Reported</th>
+                <th>Date Completed</th>
                 <th>Sanction</th>
                 <th>Remarks</th>
             </tr>
@@ -1149,8 +1196,8 @@ if ($selected_semester_id) {
                         <th>Course/Strand</th>
                         <th>Total Violations</th>
                         <th>Violation Types</th>
-                        <th>First Violation Date</th>
-                        <th>Last Violation Date</th>
+                        <th>Date Reported</th>
+                        <th>Date Completed</th>
                         <th>Sanctions</th>
                     </tr>
                 </thead>
@@ -1164,7 +1211,29 @@ if ($selected_semester_id) {
                             <td><?= $row['total_violations'] ?? 0 ?></td>
                             <td><?= safe_htmlspecialchars($row['violations']) ?></td>
                             <td><?= $row['first_violation'] ? date('M d, Y', strtotime($row['first_violation'])) : '-' ?></td>
-                            <td><?= $row['last_violation'] ? date('M d, Y', strtotime($row['last_violation'])) : '-' ?></td>
+                            <td>
+                                <?php
+                                    // Date Completed: prefer value from report_data, fall back to archive table if needed
+                                    $date_completed_display = '-';
+                                    if (!empty($row['date_completed'])) {
+                                        $date_completed_display = date('M d, Y', strtotime($row['date_completed']));
+                                    } elseif (!empty($row['student_id'])) {
+                                        $ssa_stmt = $conn->prepare("SELECT date_completed FROM student_summary_archive WHERE student_id = ? AND student_type = ? AND school_year_id = ? LIMIT 1");
+                                        if ($ssa_stmt) {
+                                            $ssa_stmt->bind_param('isi', $row['student_id'], $row['student_type'], $selected_year_id);
+                                            $ssa_stmt->execute();
+                                            $ssa_res = $ssa_stmt->get_result();
+                                            if ($ssa_row = $ssa_res->fetch_assoc()) {
+                                                if (!empty($ssa_row['date_completed'])) {
+                                                    $date_completed_display = date('M d, Y', strtotime($ssa_row['date_completed']));
+                                                }
+                                            }
+                                            $ssa_stmt->close();
+                                        }
+                                    }
+                                    echo safe_htmlspecialchars($date_completed_display);
+                                ?>
+                            </td>
                             <td>
                                 <?php
                                     // Display 'Completed (N hours)' when sanction is Completed, otherwise show status

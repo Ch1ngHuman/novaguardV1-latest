@@ -151,8 +151,18 @@ try {
 
                 // Commit transaction
                 $conn->commit();
-
-                    // Do not modify student_summary_archive on sanction deletion here (archive should reflect only added hours)
+                
+                    // Mark archive as completed for this student/school year
+                    try {
+                        $archive_upd = $conn->prepare("UPDATE student_summary_archive SET date_completed = NOW() WHERE student_id = ? AND student_type = ? AND school_year_id = ?");
+                        if ($archive_upd) {
+                            $archive_upd->bind_param('isi', $student_id, $student_type, $current_school_year_id);
+                            $archive_upd->execute();
+                            $archive_upd->close();
+                        }
+                    } catch (Exception $e) {
+                        error_log('Failed to set date_completed in student_summary_archive during reduce_sanction: ' . $e->getMessage());
+                    }
 
                 echo json_encode([
                     'success' => true,

@@ -66,8 +66,20 @@ try {
     
     if ($update_stmt->execute()) {
         if ($update_stmt->affected_rows > 0) {
-            // Do not modify student_summary_archive here: archive should only be incremented when hours are added
-            echo json_encode(['success' => true, 'message' => 'Sanction removed successfully']);
+                    // Update archive: mark date_completed since sanction was completed
+                    try {
+                        $upd = $conn->prepare("UPDATE student_summary_archive SET date_completed = NOW() WHERE student_id = ? AND student_type = ? AND school_year_id = ?");
+                        if ($upd) {
+                            $upd->bind_param('isi', $student_id, $student_type, $current_school_year_id);
+                            $upd->execute();
+                            $upd->close();
+                        }
+                    } catch (Exception $e) {
+                        // don't fail the request if archive update fails; just log
+                        error_log('Failed to set date_completed in student_summary_archive: ' . $e->getMessage());
+                    }
+
+                    echo json_encode(['success' => true, 'message' => 'Sanction removed successfully']);
         } else {
             echo json_encode(['success' => false, 'message' => 'No active sanction found to remove']);
         }
