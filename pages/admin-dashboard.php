@@ -74,7 +74,7 @@ $totalStudents = $totalJHS + $totalSHS + $totalCollege;
 // Count active violations for current school year and semester only
 if ($current_year_id) {
     $violations_query = "SELECT COUNT(*) as count FROM (
-                        SELECT id FROM hs_violations WHERE school_year_id = ? AND semester_id = ?
+                        SELECT id FROM hs_violations WHERE school_year_id = ?
                         UNION ALL
                         SELECT id FROM shs_violations WHERE school_year_id = ? AND semester_id = ?
                         UNION ALL
@@ -83,7 +83,7 @@ if ($current_year_id) {
                         SELECT id FROM college_crim_violations WHERE school_year_id = ? AND semester_id = ?
                         ) as all_violations";
     $stmt = $conn->prepare($violations_query);
-    $stmt->bind_param("iiiiiiii", $current_year_id, $current_semester_id, $current_year_id, $current_semester_id, $current_year_id, $current_semester_id, $current_year_id, $current_semester_id);
+    $stmt->bind_param("iiiiiii", $current_year_id, $current_year_id, $current_semester_id, $current_year_id, $current_semester_id, $current_year_id, $current_semester_id);
     $stmt->execute();
     $result = $stmt->get_result();
     if ($result) {
