@@ -291,11 +291,11 @@ if (isset($_SESSION['success_message'])) {
     <div class="hover-text-field right" id="rightTextField">
         <div class="content-container">
             <div class="system-info">
-                <h2> NOVA GUARD SYSTEM</h2>
+                <h2> About us </h2>
                 <h3>Our Story</h3>
                 
                 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;At Nova Schola Tanauan, our team set out to solve the challenge of keeping school discipline organized, safe, and transparent.</p> 
-                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;We designed NovaGuard, a monitoring and reporting system for student violations, aiming to make disciplinary processes more accurate and efficient.</p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;We designed Student Violation Monitoring System, a monitoring and reporting system for student violations, aiming to make disciplinary processes more accurate and efficient.</p>
                 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;By replacing outdated manual logbooks with a digital platform, we help staff and guards quickly record, manage, and review violations and ensure that data is always reliable and secure.</p>
                 
                 <div class="version-info">
@@ -325,12 +325,12 @@ if (isset($_SESSION['success_message'])) {
     </div>
 
     <div class="brand-logo-right" id="rightLogo">
-        <img src="./assets/icons/images/NovaGuardLogo.png" alt="NovaGuard Logo" onerror="this.src='https://via.placeholder.com/100x100/007bff/white?text=NOVA'">
+        <img src="./assets/icons/images/NovaScholaLogo.png" alt="Nova Schola Logo" onerror="this.src='https://via.placeholder.com/100x100/007bff/white?text=NOVA'">
     </div>
 
     <div class="index-page">
         <div class="header-section">
-            <h1>Nova Guard</h1>
+            <h1>Nova Schola</h1>
             <h3>Student Violation Monitoring System</h3>
         </div>
         <div class="login-container">

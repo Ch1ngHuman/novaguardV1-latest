@@ -725,11 +725,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
             
     <div class="index-page">
         <div class="header-section">      
-            <h1>Nova Guard</h1>
-            <h3>Student Violation Monitoring System</h3>
+            <h1>Student Violation Monitoring System</h1>
         </div>
         <div class="wrapper">
-            <p>Please Select Student Department</p>
+            <p>Please Select Student Department to Import</p>
         </div>
         <div class="login-container">
             <div class="role-selection">

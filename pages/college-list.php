@@ -107,9 +107,11 @@ $success = isset($_GET['success']) && $_GET['success'] === '1';
     <!-- Search Controls and Register Button -->
     <div style="margin: 20px 0; display: flex; justify-content: center; align-items: center; gap: 20px;">
       <input type="text" id="searchInput" placeholder="Search by name..." style="padding: 8px; border-radius: 5px; border: 1px solid #ccc; width: 220px;" autocomplete="off">
+      <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
       <a href="college_register.php" style="background: #667eea; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; display: inline-block; font-weight: bold;">
         Register Student
       </a>
+      <?php endif; ?>
     </div>
 
     <!-- College Students Table -->

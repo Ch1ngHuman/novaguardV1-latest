@@ -30,8 +30,7 @@ if (isset($_SESSION['role'])) {
             
     <div class="index-page">
         <div class="header-section">      
-            <h1>Nova Guard</h1>
-            <h3>Student Violation Monitoring System</h3>
+            <h1>Student Violation Monitoring System</h1>
         </div>
         <div class="wrapper">
             <p>Please Select Student Department</p>

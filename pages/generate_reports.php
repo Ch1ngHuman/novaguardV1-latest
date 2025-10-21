@@ -1066,7 +1066,6 @@ if ($selected_semester_id) {
         <div class="print-header">
             <div class="left"><img src="../assets/icons/images/NovaScholaLogo.png" alt="Nova Schola Logo"></div>
             <div class="title"><h2  style="margin:0; color: #000000;">Violation Report - <?= safe_htmlspecialchars($selected_year_info['school_year'] ?? '') ?><?= $selected_semester_info ? ' - ' . safe_htmlspecialchars($selected_semester_info['semester_name']) : '' ?></h2></div>
-            <div class="right"><img src="../assets/icons/images/NovaGuardLogo.png" alt="NovaGuard Logo"></div>
         </div>
 
         <!-- Display delete message if exists -->

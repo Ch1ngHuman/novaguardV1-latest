@@ -137,13 +137,10 @@ if ($current_year_id) {
         <div class="welcome-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
                 <div style="text-align: center;">
-                    <h1 style="margin: 0;">NOVA GUARD</h1>
+                    <h1 style="margin: 0;">Student Violation Monitoring System</h1>
                     <h3 style="color: #272729; margin: 5px 0;">S.Y. <?php echo htmlspecialchars($current_school_year_text); ?> - <?php echo htmlspecialchars($current_semester); ?></h3>
                     <p>Welcome, <?= htmlspecialchars($_SESSION['name']) ?>!</p>
                 </div>
-            <div>
-                <img src="../assets/icons/images/NovaGuardLogo.png" alt="NovaGuard Logo" style="width: 150px; height: auto; border-radius: 10px;">
-            </div>
             </div>
         </div>
 

@@ -138,7 +138,7 @@ function getSanctionRowColor($sanction_hours, $sanction_status) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assign Punishment - NovaGuard</title>
+    <title>Assign Sanction - NovaGuard</title>
     <link rel="stylesheet" href="../styles/style.css">
     <style>
         @keyframes slideDown {
@@ -352,7 +352,7 @@ function getSanctionRowColor($sanction_hours, $sanction_status) {
         </div>
 
         <div class="header-section" style="background: linear-gradient(135deg, #667eea 0%, #282bf0 100%); padding: 20px; border-radius: 10px; margin: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">    
-            <h1 style="padding-top: 40px; color: #231f1f;">Assign Punishment</h1>
+            <h1 style="padding-top: 40px; color: #231f1f;">Assign Sanction</h1>
             <h3 style="text-align: center; color:rgb(255, 255, 255);">S.Y. <?php echo htmlspecialchars($current_school_year_name); ?> - <?php echo htmlspecialchars($current_semester); ?></h3>
         </div>
 
@@ -413,7 +413,7 @@ function getSanctionRowColor($sanction_hours, $sanction_status) {
                                     </td>
                                     <td style="padding:8px;">
                                         <button onclick="addSanction(this, <?php echo $violation['student_id']; ?>, 'jhs')" style="background: #667eea; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px;">Add Sanction</button>
-                                        <button onclick="removeSanction(this, <?php echo $violation['student_id']; ?>, 'jhs')" style="background: #ff4757; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer;">Remove Sanction</button>
+                                        <button onclick="removeSanction(this, <?php echo $violation['student_id']; ?>, 'jhs')" style="background: #ff4757; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer;">Sanction Served</button>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -471,7 +471,7 @@ function getSanctionRowColor($sanction_hours, $sanction_status) {
                                     </td>
                                     <td style="padding:8px;">
                                         <button onclick="addSanction(this, <?php echo $violation['student_id']; ?>, 'shs')" style="background: #667eea; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px;">Add Sanction</button>
-                                        <button onclick="removeSanction(this, <?php echo $violation['student_id']; ?>, 'shs')" style="background: #ff4757; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer;">Remove Sanction</button>
+                                        <button onclick="removeSanction(this, <?php echo $violation['student_id']; ?>, 'shs')" style="background: #ff4757; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer;">Sanction Served</button>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -529,7 +529,7 @@ function getSanctionRowColor($sanction_hours, $sanction_status) {
                                     </td>
                                     <td style="padding:8px;">
                                         <button onclick="addSanction(this, <?php echo $violation['student_id']; ?>, 'college')" style="background: #667eea; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px;">Add Sanction</button>
-                                        <button onclick="removeSanction(this, <?php echo $violation['student_id']; ?>, 'college')" style="background: #ff4757; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer;">Remove Sanction</button>
+                                        <button onclick="removeSanction(this, <?php echo $violation['student_id']; ?>, 'college')" style="background: #ff4757; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer;">Sanction Served</button>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
