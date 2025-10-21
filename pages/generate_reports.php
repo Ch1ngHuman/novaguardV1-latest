@@ -37,17 +37,29 @@ if (isset($_GET['export']) && $_GET['export'] === 'xlsx') {
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
+        // Add School Year header
+        $sheet->setCellValue('A1', 'S.Y: ' . ($current_school_year['school_year'] ?? '2025-2026'));
+        $sheet->getStyle('A1')->getFont()->setBold(true);
+        $sheet->getStyle('A1')->getFont()->setSize(14);
+        
+        // Merge cells for the header
+        $sheet->mergeCells('A1:L1');
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        // Add some spacing
+        $sheet->getRowDimension('2')->setRowHeight(10);
+
     // Header row (remove Last Violation Date column — column removed from DB)
     // Added 'Date Completed' column between Date Reported and Sanctions
     $headers = ['Name', 'Year&Course', 'First Violation Date', 'Violation 1', 'Violation 2', 'Violation 3', 'Violation 4', 'Violation 5', 'Date Reported', 'Date Completed', 'Sanction', 'Comment/s'];
         $col = 'A';
         foreach ($headers as $h) {
-            $sheet->setCellValue($col . '1', $h);
+            $sheet->setCellValue($col . '3', $h);
             $col++;
         }
 
-    // Make header bold (A1:L1)
-    $sheet->getStyle('A1:L1')->getFont()->setBold(true);
+    // Make header bold (A3:L3)
+    $sheet->getStyle('A3:L3')->getFont()->setBold(true);
 
         // Fill data rows
         $rowNum = 2;
@@ -131,6 +143,29 @@ if (isset($_GET['export']) && $_GET['export'] === 'xlsx') {
 
             $rowNum++;
         }
+
+        // Add spacing before signatures
+        $rowNum += 2;
+
+        // Add signature lines
+        $sheet->setCellValue('B' . $rowNum, 'Prepared by:');
+        $sheet->setCellValue('J' . $rowNum, 'Noted by:');
+        
+        $rowNum += 3;
+        
+        $sheet->setCellValue('B' . $rowNum, '_____________________');
+        $sheet->setCellValue('J' . $rowNum, '_____________________');
+        
+        $rowNum++;
+        
+        $sheet->setCellValue('B' . $rowNum, 'Office of Student Affairs');
+        $sheet->setCellValue('J' . $rowNum, 'School Administrator');
+        
+        // Center align the signature sections
+        $sheet->getStyle('B' . ($rowNum-3) . ':B' . $rowNum)->getAlignment()
+              ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('J' . ($rowNum-3) . ':J' . $rowNum)->getAlignment()
+              ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
         // Auto-size columns (optional)
         foreach (range('A', 'L') as $columnID) {
